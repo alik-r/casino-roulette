@@ -6,6 +6,7 @@ import (
 
 	"github.com/alik-r/casino-roulette/backend/pkg/api"
 	"github.com/alik-r/casino-roulette/backend/pkg/db"
+	"github.com/alik-r/casino-roulette/backend/pkg/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )
@@ -26,10 +27,14 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(cors.Handler(corsOptions))
-	r.Route("/api", func(r chi.Router) {
-		r.Post("/user/deposit", api.RegisterOrDeposit)
-		r.Post("/roulette/bet", api.PlaceBet)
-		r.Get("/leaderboard", api.GetLeaderBoard)
+
+	r.Post("/api/login", api.Login)
+	r.Get("/api/leaderboard", api.GetLeaderBoard)
+
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.JWTAuth)
+		r.Post("/api/user/deposit", api.RegisterOrDeposit)
+		r.Post("/api/roulette/bet", api.PlaceBet)
 	})
 
 	log.Println("Server running on port 8080")

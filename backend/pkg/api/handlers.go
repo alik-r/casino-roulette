@@ -2,26 +2,79 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	"github.com/alik-r/casino-roulette/backend/pkg/auth"
 	"github.com/alik-r/casino-roulette/backend/pkg/db"
+	"github.com/alik-r/casino-roulette/backend/pkg/middleware"
 	"github.com/alik-r/casino-roulette/backend/pkg/models"
 	"github.com/alik-r/casino-roulette/backend/pkg/roulette"
 	"gorm.io/gorm"
 )
 
-type DepositRequest struct {
+type LoginRequest struct {
 	Username string `json:"username"`
-	Amount   int    `json:"amount"`
+	Password string `json:"password"`
+}
+
+type DepositRequest struct {
+	Amount int `json:"amount"`
 }
 
 type BetRequest struct {
-	Username  string `json:"username"`
 	BetAmount int    `json:"bet_amount"`
 	BetColor  string `json:"bet_color"`
 }
 
+func Login(w http.ResponseWriter, r *http.Request) {
+	var loginRequest LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	err := db.DB.Where("username = ?", loginRequest.Username).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			user = models.User{
+				Username: loginRequest.Username,
+				Password: loginRequest.Password,
+				Balance:  0,
+			}
+			if err := db.DB.Create(&user).Error; err != nil {
+				http.Error(w, "failed to create user", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			http.Error(w, "error checking user", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		if user.Password != loginRequest.Password {
+			http.Error(w, "invalid password", http.StatusBadRequest)
+			return
+		}
+	}
+
+	token, err := auth.GenerateJWT(user.Username)
+	if err != nil {
+		http.Error(w, "error generating token", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"token": token})
+}
+
 func RegisterOrDeposit(w http.ResponseWriter, r *http.Request) {
+	username, ok := r.Context().Value(middleware.UsernameKey).(string)
+	if !ok || username == "" {
+		http.Error(w, "missing username", http.StatusBadRequest)
+		return
+	}
+
 	var deposit DepositRequest
 	err := json.NewDecoder(r.Body).Decode(&deposit)
 	if err != nil {
@@ -29,17 +82,18 @@ func RegisterOrDeposit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if deposit.Username == "" || deposit.Amount <= 0 {
-		http.Error(w, "invalid username or amount", http.StatusBadRequest)
+	if deposit.Amount <= 0 {
+		http.Error(w, "invalid deposit amount", http.StatusBadRequest)
 		return
 	}
 
 	var user models.User
-	err = db.DB.Where("username = ?", deposit.Username).First(&user).Error
+	err = db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			user = models.User{
-				Username: deposit.Username,
+				Username: username,
+				Password: "1234",
 				Balance:  deposit.Amount,
 			}
 			if err := db.DB.Create(&user).Error; err != nil {
@@ -64,6 +118,12 @@ func RegisterOrDeposit(w http.ResponseWriter, r *http.Request) {
 }
 
 func PlaceBet(w http.ResponseWriter, r *http.Request) {
+	username, ok := r.Context().Value(middleware.UsernameKey).(string)
+	if !ok || username == "" {
+		http.Error(w, "missing username", http.StatusBadRequest)
+		return
+	}
+
 	var betRequest BetRequest
 	err := json.NewDecoder(r.Body).Decode(&betRequest)
 	if err != nil {
@@ -71,13 +131,13 @@ func PlaceBet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if betRequest.Username == "" || betRequest.BetAmount <= 0 || !roulette.IsValidColor(betRequest.BetColor) {
-		http.Error(w, "invalid username, bet amount or color", http.StatusBadRequest)
+	if betRequest.BetAmount <= 0 || !roulette.IsValidColor(betRequest.BetColor) {
+		http.Error(w, "invalid bet amount or color", http.StatusBadRequest)
 		return
 	}
 
 	var user models.User
-	err = db.DB.Where("username = ?", betRequest.Username).First(&user).Error
+	err = db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "user not found", http.StatusNotFound)

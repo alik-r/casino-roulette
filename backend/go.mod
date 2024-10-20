@@ -10,6 +10,10 @@ replace github.com/alik-r/casino-roulette/backend/pkg/db => ./pkg/db
 
 replace github.com/alik-r/casino-roulette/backend/pkg/roulette => ./pkg/roulette
 
+replace github.com/alik-r/casino-roulette/backend/pkg/auth => ./pkg/auth
+
+replace github.com/alik-r/casino-roulette/backend/pkg/middleware => ./pkg/middleware
+
 require (
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.12
@@ -18,6 +22,7 @@ require (
 require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/cors v1.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
