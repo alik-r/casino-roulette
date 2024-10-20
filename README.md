@@ -53,7 +53,7 @@ Casino Roulette is a web application that simulates a roulette game. Users can r
 2. Install dependencies:
 
     ```sh
-    go mod tidy
+    go mod install
     ```
 
 ## Running the Application
@@ -76,7 +76,6 @@ The server will be running on `http://localhost:8080`.
 
     ```json
     {
-        "username": "string",
         "amount": "int"
     }
     ```
@@ -99,7 +98,6 @@ The server will be running on `http://localhost:8080`.
 
     ```json
     {
-        "username": "string",
         "bet_amount": "int",
         "bet_color": "{red|black|green}"
     }
