@@ -195,7 +195,7 @@ func PlaceBet(w http.ResponseWriter, r *http.Request) {
 
 func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	var users []models.User
-	err := db.DB.Order("balance desc").Find(&users).Error
+	err := db.DB.Order("balance desc").Limit(10).Find(&users).Error
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
