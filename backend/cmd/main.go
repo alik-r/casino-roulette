@@ -7,6 +7,7 @@ import (
 	"github.com/alik-r/casino-roulette/backend/pkg/api"
 	"github.com/alik-r/casino-roulette/backend/pkg/db"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 func main() {
@@ -14,7 +15,17 @@ func main() {
 
 	db.InitDB()
 
+	corsOptions := cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}
+
 	r := chi.NewRouter()
+	r.Use(cors.Handler(corsOptions))
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/user/deposit", api.RegisterOrDeposit)
 		r.Post("/roulette/bet", api.PlaceBet)
