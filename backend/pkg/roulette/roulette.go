@@ -41,3 +41,12 @@ func Payout(betColor, resultColor string) int {
 	}
 	return 0
 }
+
+func IsValidColor(color string) bool {
+	switch color {
+	case string(Red), string(Black), string(Green):
+		return true
+	default:
+		return false
+	}
+}

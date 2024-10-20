@@ -9,7 +9,7 @@ type User struct {
 	Username  string    `gorm:"unique;not null" json:"username"`
 	Password  string    `gorm:"not null" json:"-"`
 	Balance   int       `gorm:"default:0" json:"balance"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	Bets      []Bet     `json:"bets,omitempty"`
 }
 
@@ -20,5 +20,5 @@ type Bet struct {
 	BetAmount int       `json:"bet_amount"`
 	BetColor  string    `json:"bet_color"`
 	Result    string    `json:"result"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
