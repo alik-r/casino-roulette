@@ -1,0 +1,175 @@
+/* Default Styles for Large Screens (Desktops) */
+@font-face {
+    font-family: 'CupheadFont';
+    src: url(fonts/CupheadPoster-Regular.ttf);
+}
+
+body {
+    background-color: #FED119;
+    font-family: 'Gabarito', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    padding-left: 50px;
+    background-image: url('images/devil.png');
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.title {
+    position: absolute;
+    text-align:  left;
+    margin-bottom:20px;
+    top: 54px;
+    left: 54px;
+    font-family: 'CupheadFont', sans-serif;
+    font-size: 56px;
+    z-index: 10;
+    width: auto;
+    height: auto;
+    color: #3F1B12;
+}
+
+.container {
+    position: relative;
+    width: 450px;
+    height: 350px;
+    background-color: #FFF6E8;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 5;
+    margin-top: 200px; /* Move container down to reveal the title */
+}
+
+.container .header button {
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 30px;
+    font-family: inherit;
+}
+
+.tab {
+    background-color: transparent;
+    color: #A6A6A6;
+}
+
+.tab-active button {
+    color: #3F1B12;
+}
+
+.container .header button:focus {
+    outline: none;
+}
+
+.container .header {
+    text-align: center;
+}
+
+.container .register-form {
+    margin-top: 30px;
+}
+
+.register-form .input-box {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.input-box label {
+    color: #A6A6A6;
+    font-size: 16px;
+    display: block;
+}
+
+.input-box input {
+    position: relative;
+    color: #3F1B12;
+    height: 40px;
+    width: 90%;
+    padding: 0 15px;
+    outline: none;
+    border-radius: 8px;
+    background-color: #E6DDCF;
+    border: none;
+    margin-bottom: 15px;
+    font-family: inherit;
+}
+
+/* Responsive Styles for Tablets */
+@media (max-width: 768px) {
+    .title {
+        font-size: 48px;
+        top: 30px;
+        left: 30px;
+    }
+
+    .container {
+        width: 350px;
+        margin-top: 80px;
+        padding: 20px;
+    }
+
+    body {
+        padding-left: 30px;
+        background-position: right;
+        background-size: 60%; /* Smaller background image */
+    }
+}
+
+/* Responsive Styles for Mobile Devices */
+@media (max-width: 480px) {
+    .title {
+        font-size: 32px;
+        top: 20px;
+        left: 20px;
+    }
+
+    .container {
+        width: 90%;
+        margin-top: 60px;
+        padding: 15px;
+    }
+
+    .container .header button {
+        font-size: 18px;
+        margin: 0 15px;
+    }
+
+    body {
+        padding-left: 10px;
+        background-position: right;
+        background-size: 50%; /* Even smaller background image */
+    }
+}
+
+/*Avatar selection process */
+
+.avatar-grid{
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 5px;
+    
+}
+
+.avatar-item{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden;
+    
+}
+.avatar-item img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.selected{
+    border: 5px solid #FED119;
+   
+}
