@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap">
+    <link rel="stylesheet" href="styles/main_style.css">
+
+    <title>Register</title>
+</head>
+
+<body>
+    <div class="title">
+        Don’t bet on <br>
+        your soul
+    </div>
+    <section class="container">
+        <div class="header">
+            <button class="tab" id="login-tab">Login</button>
+            <button class="tab-active" id="register-tab">Register</button>
+        </div>
+        <form id="register-form">
+            <div class="input-box">
+                <label>Email</label>
+                <input type="email" name="email-register">
+            </div>
+            <div class="input-box">
+                <label>Password</label>
+                <input type="password" name = 'password-register'>
+            </div>
+            <div class="input-box">
+                <label>Avatar</label>
+                <div id="avatarContainer" class="avatar-grid">
+
+                </div>
+
+            </div>
+        </form>
+        <form id="login-form" style="display: none;">
+            <div class="input-box">
+                <label>Email</label>
+                <input type="email" name="login-email">
+            </div>
+            <div class="input-box">
+                <label>Password</label>
+                <input type="password" name="login-password">
+            </div>
+        </form>
+    </section>
+    <script src="scripts/avatar.js"></script>
+    <script src="scripts/script.js"></script>
+    
+</body>
+
+</html>
