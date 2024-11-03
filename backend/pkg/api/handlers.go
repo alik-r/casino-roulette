@@ -71,7 +71,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"token": token, "is_register": strconv.FormatBool(isRegister)})
 }
 
-func RegisterOrDeposit(w http.ResponseWriter, r *http.Request) {
+func Deposit(w http.ResponseWriter, r *http.Request) {
 	username, ok := r.Context().Value(middleware.UsernameKey).(string)
 	if !ok || username == "" {
 		http.Error(w, "missing username", http.StatusBadRequest)
@@ -86,23 +86,16 @@ func RegisterOrDeposit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if deposit.Amount <= 0 {
-		http.Error(w, "invalid deposit amount", http.StatusBadRequest)
+		http.Error(w, "Invalid deposit amount", http.StatusBadRequest)
 		return
 	}
 
 	var user models.User
 	err = db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			user = models.User{
-				Username: username,
-				Password: "1234",
-				Balance:  deposit.Amount,
-			}
-			if err := db.DB.Create(&user).Error; err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -196,7 +189,7 @@ func PlaceBet(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
+func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 	var users []models.User
 	err := db.DB.Order("balance desc").Limit(10).Find(&users).Error
 	if err != nil {

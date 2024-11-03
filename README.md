@@ -68,7 +68,28 @@ The server will be running on `http://localhost:8080`.
 
 ## API Endpoints
 
-### Register or Deposit
+### Login 
+- **URL:** `/api/user/login`
+- **Method:** `POST`
+- **Request Body:**
+
+    ```json
+    {
+        "username": "string",
+        "password": "string"
+    }
+    ```
+
+- **Response:**
+
+    ```json
+    {
+        "token": "string",
+        "is_register": "boolean"
+    }
+    ```
+
+### Deposit
 
 - **URL:** `/api/user/deposit`
 - **Method:** `POST`
@@ -107,6 +128,7 @@ The server will be running on `http://localhost:8080`.
 
     ```json
     {
+        "username": "string",
         "balance": "int",
         "bet_amount": "int",
         "bet_color": "{red|black|green}",
