@@ -3,10 +3,24 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
-    volumes:
-      - ./backend/roulette.db:/root/roulette.db
+    environment:
+      - DATABASE_URL=postgres://gambler:ilovegambling@postgres:5432/casino?sslmode=disable
+    depends_on:
+      - postgres
     restart: on-failure
-  
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: gambler
+      POSTGRES_PASSWORD: ilovegambling
+      POSTGRES_DB: casino
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: on-failure
+
   frontend:
     build: ./frontend
     ports:
@@ -14,3 +28,6 @@ services:
     depends_on:
       - backend
     restart: on-failure
+
+volumes:
+  pgdata:
