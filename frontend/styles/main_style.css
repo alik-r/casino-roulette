@@ -1,7 +1,7 @@
 /* Default Styles for Large Screens (Desktops) */
 @font-face {
     font-family: 'CupheadFont';
-    src: url(fonts/CupheadPoster-Regular.ttf);
+    src: url(../fonts/CupheadPoster-Regular.ttf);
 }
 
 body {
@@ -12,7 +12,7 @@ body {
     justify-content: flex-start;
     height: 100vh;
     padding-left: 50px;
-    background-image: url('images/devil.png');
+    background-image: url('../images/devil.png');
     background-position: right;
     background-size: contain;
     background-repeat: no-repeat;
