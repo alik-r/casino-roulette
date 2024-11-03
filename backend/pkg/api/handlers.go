@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/alik-r/casino-roulette/backend/pkg/auth"
 	"github.com/alik-r/casino-roulette/backend/pkg/db"
@@ -35,37 +36,39 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
+	isRegister := false
 	err := db.DB.Where("username = ?", loginRequest.Username).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			user = models.User{
 				Username: loginRequest.Username,
 				Password: loginRequest.Password,
-				Balance:  0,
+				Balance:  1000,
 			}
 			if err := db.DB.Create(&user).Error; err != nil {
-				http.Error(w, "failed to create user", http.StatusInternalServerError)
+				http.Error(w, "Failed to create user", http.StatusInternalServerError)
 				return
 			}
+			isRegister = true
 		} else {
-			http.Error(w, "error checking user", http.StatusInternalServerError)
+			http.Error(w, "Error checking user", http.StatusInternalServerError)
 			return
 		}
 	} else {
 		if user.Password != loginRequest.Password {
-			http.Error(w, "invalid password", http.StatusBadRequest)
+			http.Error(w, "Invalid password", http.StatusBadRequest)
 			return
 		}
 	}
 
 	token, err := auth.GenerateJWT(user.Username)
 	if err != nil {
-		http.Error(w, "error generating token", http.StatusInternalServerError)
+		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": token})
+	json.NewEncoder(w).Encode(map[string]string{"token": token, "is_register": strconv.FormatBool(isRegister)})
 }
 
 func RegisterOrDeposit(w http.ResponseWriter, r *http.Request) {
