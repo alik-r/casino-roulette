@@ -15,15 +15,15 @@ services:
       POSTGRES_USER: gambler
       POSTGRES_PASSWORD: ilovegambling
       POSTGRES_DB: casino
-    ports:
-      - "5433:5432"
+    expose:
+      - "5433"
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: on-failure
 
   frontend:
     build: ./frontend
-    ports:
+    expose:
       - "81:80"
     depends_on:
       - backend
