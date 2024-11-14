@@ -18,6 +18,7 @@ type LoginRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Avatar   string `json:"avatar,omitempty"`
 }
 
 type DepositRequest struct {
@@ -51,9 +52,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			if loginRequest.Avatar == "" {
+				loginRequest.Avatar = "images/avatars/avatar1.png"
+			}
+
 			user = models.User{
 				Username: loginRequest.Username,
 				Email:    loginRequest.Email,
+				Avatar:   loginRequest.Avatar,
 				Password: loginRequest.Password,
 				Balance:  1000,
 			}
