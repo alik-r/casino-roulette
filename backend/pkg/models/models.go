@@ -7,6 +7,8 @@ import (
 type User struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Username  string    `gorm:"unique;not null" json:"username"`
+	Email     string    `gorm:"unique;not null" json:"email"`
+	Avatar    string    `json:"avatar"`
 	Password  string    `gorm:"not null" json:"-"`
 	Balance   int       `gorm:"default:0" json:"balance"`
 	CreatedAt time.Time `json:"-" gorm:"autoCreateTime"`

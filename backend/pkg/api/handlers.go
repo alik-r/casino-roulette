@@ -16,7 +16,9 @@ import (
 
 type LoginRequest struct {
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
+	Avatar   string `json:"avatar,omitempty"`
 }
 
 type DepositRequest struct {
@@ -37,11 +39,27 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
 	isRegister := false
-	err := db.DB.Where("username = ?", loginRequest.Username).First(&user).Error
+	query := db.DB.Where("email = ?", loginRequest.Email)
+	if loginRequest.Username != "" {
+		query = query.Or("username = ?", loginRequest.Username)
+	}
+
+	err := query.First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if loginRequest.Username == "" || loginRequest.Email == "" {
+				http.Error(w, "Both username and email are required", http.StatusBadRequest)
+				return
+			}
+
+			if loginRequest.Avatar == "" {
+				loginRequest.Avatar = "images/avatars/avatar1.png"
+			}
+
 			user = models.User{
 				Username: loginRequest.Username,
+				Email:    loginRequest.Email,
+				Avatar:   loginRequest.Avatar,
 				Password: loginRequest.Password,
 				Balance:  1000,
 			}
@@ -68,7 +86,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": token, "is_register": strconv.FormatBool(isRegister)})
+	json.NewEncoder(w).Encode(map[string]string{
+		"token":       token,
+		"is_register": strconv.FormatBool(isRegister),
+	})
 }
 
 func Deposit(w http.ResponseWriter, r *http.Request) {
