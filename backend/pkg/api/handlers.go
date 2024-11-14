@@ -36,11 +36,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if loginRequest.Username == "" || loginRequest.Email == "" {
-		http.Error(w, "Both username and email are required", http.StatusBadRequest)
-		return
-	}
-
 	var user models.User
 	isRegister := false
 	query := db.DB.Where("email = ?", loginRequest.Email)
@@ -51,6 +46,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := query.First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if loginRequest.Username == "" || loginRequest.Email == "" {
+				http.Error(w, "Both username and email are required", http.StatusBadRequest)
+				return
+			}
+
 			user = models.User{
 				Username: loginRequest.Username,
 				Email:    loginRequest.Email,
