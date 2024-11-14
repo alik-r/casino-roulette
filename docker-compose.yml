@@ -15,6 +15,7 @@ services:
       POSTGRES_USER: gambler
       POSTGRES_PASSWORD: ilovegambling
       POSTGRES_DB: casino
+      PGPORT: 5433
     expose:
       - "5433"
     volumes:
