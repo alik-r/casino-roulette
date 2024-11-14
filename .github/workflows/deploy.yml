@@ -50,9 +50,10 @@ jobs:
             #   sudo chmod +x /usr/local/bin/docker-compose
             # fi
             # Build and start/restart containers with Docker Compose
-            sudo docker compose down      # Stop existing containers, if any
-            sudo docker compose pull      # Pull new images if they have changed
-            sudo docker compose up -d --build   # Rebuild and start containers in detached mode
+            sudo docker compose down                # Stop existing containers, if any
+            sudo docker compose pull                # Pull new images if they have changed
+            sudo docker compose build --no-cache    # Rebuild images
+            sudo docker compose up -d               # Start containers in detached mode
 
       - name: Update deployment Status (success)
         if: success()
