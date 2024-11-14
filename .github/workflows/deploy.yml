@@ -40,7 +40,7 @@ jobs:
             # Set up GitHub authentication for pulling updates
             git config --global url."https://${{ secrets.PERSONAL_GITHUB_TOKEN }}:@github.com".insteadOf "https://github.com"
             # Navigate to project directory (assuming your docker-compose.yml is in the root)
-            cd ~/casino-roulette
+            cd /var/www/casino.alikamran.cc
             # Pull the latest code from the main branch
             git pull origin main
             # Ensure Docker Compose is installed (if not already)
@@ -50,9 +50,9 @@ jobs:
             #   sudo chmod +x /usr/local/bin/docker-compose
             # fi
             # Build and start/restart containers with Docker Compose
-            docker-compose down      # Stop existing containers, if any
-            docker-compose pull      # Pull new images if they have changed
-            docker-compose up -d --build   # Rebuild and start containers in detached mode
+            sudo docker compose down      # Stop existing containers, if any
+            sudo docker compose pull      # Pull new images if they have changed
+            sudo docker compose up -d --build   # Rebuild and start containers in detached mode
 
       - name: Update deployment Status (success)
         if: success()
