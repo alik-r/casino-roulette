@@ -44,11 +44,11 @@ jobs:
             # Pull the latest code from the main branch
             git pull origin main
             # Ensure Docker Compose is installed (if not already)
-            if ! command -v docker-compose &> /dev/null; then
-              echo "Docker Compose not found, installing..."
-              sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-            fi
+            # if ! command -v docker-compose &> /dev/null; then
+            #   echo "Docker Compose not found, installing..."
+            #   sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')" -o /usr/local/bin/docker-compose
+            #   sudo chmod +x /usr/local/bin/docker-compose
+            # fi
             # Build and start/restart containers with Docker Compose
             docker-compose down      # Stop existing containers, if any
             docker-compose pull      # Pull new images if they have changed
