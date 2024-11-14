@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap">
     <link rel="stylesheet" href="styles/main_style.css">
-
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="scripts/avatar.js"></script>
     <title>Register</title>
 </head>
 
@@ -15,42 +18,88 @@
         Don’t bet on <br>
         your soul
     </div>
-    <section class="container">
+
+    <section class="container" x-data="{ isRegister: true }">
         <div class="header">
-            <button class="tab" id="login-tab">Login</button>
-            <button class="tab-active" id="register-tab">Register</button>
+            <button class="tab" :class="{ 'tab-active': !isRegister }" @click="isRegister = false">Login</button>
+            <button class="tab" :class="{ 'tab-active': isRegister }" @click="isRegister = true">Register</button>
         </div>
-        <form id="register-form">
+
+        <form class="container-register" id="register-form" x-show="isRegister" hx-post="/api/login" hx-trigger="submit" hx-target="#response"
+            hx-ext='json-enc' hx-headers='{"Content-Type": "application/json"}'>
+
+            <div class="input-box">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
             <div class="input-box">
                 <label>Email</label>
-                <input type="email" name="email-register">
+                <input type="email" name="email" required>
             </div>
             <div class="input-box">
                 <label>Password</label>
-                <input type="password" name = 'password-register'>
+                <input type="password" name="password" required>
             </div>
-            <div class="input-box">
-                <label>Avatar</label>
-                <div id="avatarContainer" class="avatar-grid">
 
-                </div>
+            <div class="avatar-grid" id="avatarContainer"></div>
+            <input type="hidden" name="avatar" id="selectedAvatar">
 
-            </div>
+            <button class="submit-btn" type="submit">Register</button>
         </form>
-        <form id="login-form" style="display: none;">
+
+        <form class="container-login" id="login-form" x-show="!isRegister" hx-post="/api/login" hx-trigger="submit" hx-include="#login-form"
+            hx-target="#response" hx-headers='{"Content-Type": "application/json"}' hx-ext='json-enc'>
             <div class="input-box">
                 <label>Email</label>
-                <input type="email" name="login-email">
+                <input type="email" name="email" required>
             </div>
             <div class="input-box">
                 <label>Password</label>
-                <input type="password" name="login-password">
+                <input type="password" name="password" required>
             </div>
+            <button class="submit-btn" type="submit">Login</button>
         </form>
+
+        <div id="response"></div>
     </section>
-    <script src="scripts/avatar.js"></script>
-    <script src="scripts/script.js"></script>
-    
-</body>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const avatarContainer = document.getElementById('avatarContainer');
+            const selectedAvatarInput = document.getElementById('selectedAvatar');
+
+            avatarContainer.addEventListener('click', function (event) {
+                if (event.target && event.target.tagName === 'IMG') {
+                    const avatarDiv = event.target.closest('.avatar-item');
+                    const avatarPath = event.target.src;
+
+                    document.querySelectorAll('.avatar-item').forEach(item => item.classList.remove('selected'));
+                    avatarDiv.classList.add('selected');
+
+                    selectedAvatarInput.value = avatarPath;
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("htmx:afterRequest", (event) => {
+            if (event.detail.successful) {
+                const response = JSON.parse(event.detail.xhr.responseText);
+                if (response.token) {
+                    localStorage.setItem("authToken", response.token);
+
+                    if (response.is_register === "true") {
+                        document.getElementById("response").innerText = "Registered successfully!";
+                    } else {
+                        document.getElementById("response").innerText = "Logged in successfully!";
+                    }
+
+                    location.href = "/roulette.html";
+                } else {
+                    document.getElementById("response").innerText = "Failed to login or register.";
+                }
+            }
+        });
+    </script>
+</body>
 </html>
