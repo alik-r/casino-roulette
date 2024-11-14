@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     name: Deploy project
@@ -12,10 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: 'actions/checkout@v2'
+        uses: actions/checkout@v2
         with:
           ref: main
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          
       - name: Create GitHub deployment
         uses: chrnorm/deployment-action@v2
         id: deployment
@@ -23,8 +25,8 @@ jobs:
           token: '${{ github.token }}'
           environment-url: ${{ vars.MY_APP }}
           environment: production
+
       - name: Set up SSH Key and Deploy my App on Server
-        # run: |
         uses: appleboy/ssh-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
@@ -34,12 +36,23 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            # Set up GitHub authentication for pulling updates
             git config --global url."https://${{ secrets.PERSONAL_GITHUB_TOKEN }}:@github.com".insteadOf "https://github.com"
-            cd chatg/
+            # Navigate to project directory (assuming your docker-compose.yml is in the root)
+            # cd /path/to/your/project
+            # Pull the latest code from the main branch
             git pull origin main
-            npm ci
-            npm run frontend
-            pm2 restart chatg --update-env
+            # Ensure Docker Compose is installed (if not already)
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Docker Compose not found, installing..."
+              sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+            # Build and start/restart containers with Docker Compose
+            docker-compose down      # Stop existing containers, if any
+            docker-compose pull      # Pull new images if they have changed
+            docker-compose up -d --build   # Rebuild and start containers in detached mode
+
       - name: Update deployment Status (success)
         if: success()
         uses: chrnorm/deployment-status@v2
