@@ -29,11 +29,11 @@ func main() {
 	r.Use(cors.Handler(corsOptions))
 
 	r.Post("/api/login", api.Login)
-	r.Get("/api/leaderboard", api.GetLeaderboard)
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth)
 		r.Post("/api/user/deposit", api.Deposit)
+		r.Get("/api/leaderboard", api.GetLeaderboard)
 		r.Post("/api/roulette", api.PlaceBet)
 	})
 

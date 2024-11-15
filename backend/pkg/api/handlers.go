@@ -97,7 +97,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Deposit(w http.ResponseWriter, r *http.Request) {
 	username, ok := r.Context().Value(middleware.UsernameKey).(string)
 	if !ok || username == "" {
-		http.Error(w, "Unauthenticated user", http.StatusForbidden)
+		http.Error(w, "Unauthenticated user", http.StatusUnauthorized)
 		return
 	}
 
@@ -139,7 +139,7 @@ func Deposit(w http.ResponseWriter, r *http.Request) {
 func PlaceBet(w http.ResponseWriter, r *http.Request) {
 	username, ok := r.Context().Value(middleware.UsernameKey).(string)
 	if !ok || username == "" {
-		http.Error(w, "Unauthenticated user", http.StatusForbidden)
+		http.Error(w, "Unauthenticated user", http.StatusUnauthorized)
 		return
 	}
 
@@ -253,6 +253,12 @@ func PlaceBet(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
+	username, ok := r.Context().Value(middleware.UsernameKey).(string)
+	if !ok || username == "" {
+		http.Error(w, "Unauthenticated user", http.StatusUnauthorized)
+		return
+	}
+
 	var users []models.User
 	err := db.DB.Order("balance desc").Limit(10).Find(&users).Error
 	if err != nil {
