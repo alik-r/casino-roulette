@@ -260,14 +260,28 @@ func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var users []models.User
-	err := db.DB.Order("balance desc").Limit(10).Find(&users).Error
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := db.DB.Order("balance DESC").Limit(10).Find(&users).Error; err != nil {
+		http.Error(w, "Failed to retrieve leaderboard", http.StatusInternalServerError)
 		return
 	}
 
+	type LeaderboardRow struct {
+		Username string `json:"username"`
+		Balance  int    `json:"balance"`
+		Avatar   string `json:"avatar"`
+	}
+
+	var leaderboard []LeaderboardRow
+	for _, user := range users {
+		leaderboard = append(leaderboard, LeaderboardRow{
+			Username: user.Username,
+			Balance:  user.Balance,
+			Avatar:   user.Avatar,
+		})
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(leaderboard)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
