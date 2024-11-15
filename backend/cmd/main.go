@@ -32,6 +32,7 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth)
+		r.Get("/api/user", api.GetUser)
 		r.Post("/api/user/deposit", api.Deposit)
 		r.Get("/api/leaderboard", api.GetLeaderboard)
 		r.Post("/api/roulette", api.PlaceBet)

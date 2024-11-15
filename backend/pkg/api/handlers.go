@@ -269,3 +269,31 @@ func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	username, ok := r.Context().Value(middleware.UsernameKey).(string)
+	if !ok || username == "" {
+		http.Error(w, "Unauthenticated user", http.StatusUnauthorized)
+		return
+	}
+
+	var user models.User
+	if err := db.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "User not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	response := map[string]interface{}{
+		"username": user.Username,
+		"email":    user.Email,
+		"avatar":   user.Avatar,
+		"balance":  user.Balance,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
