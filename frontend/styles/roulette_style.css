@@ -11,9 +11,67 @@ body {
     height: 100vh;
     width: 100%;
 }
-.title{
+
+.site-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: white;
+    gap: 50px;
+    padding: 10px 20px;
+    height: 60px;
+    font-family: inherit;
+}
+
+.header-section {
+    display: flex;
+    gap: 50px;
+    padding: 40px;
+}
+
+.icon-with-label {
+    margin-top: 20px;
+    width: 60px;
+    
+    font-family: inherit;
+    color: #3F1B12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.icon-button img {
+    width: 48px;
+    height: 48px;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.header-title{
     font-family: 'CupheadFont', sans-serif;
     font-size: 48px;
+    color: #3F1B12;
+    flex-grow: 1; /* Push title to the center */
+    text-align: center;
 }
 .container{
     text-align: center;
@@ -51,7 +109,7 @@ body {
 .bet_form{
     background-color: #FFF0B3;
     width: 100%;
-    height: 300px;
+    height: 400px;
     text-align: center;
     font-family: inherit;
     border-radius: 8px;
@@ -60,25 +118,33 @@ body {
 }
 .bet_form p{
     display: flex;
-    margin: 10px;
+    margin: 5px;
+    
     font-size: 28px;
    
+   
 }
+
 .input-box label{
     font-size: 24px;
 
 }
 
-.input-color{
+.bet-category{
     display: flex;
-    padding-left: 15px;
-    gap: 20px;
+    padding-left: 20px;
+    gap: 10px;
 
+}
+.input-label{
+    padding-left: 15px;
+    padding-top: 15px;
+    margin: 0px;
 }
 .color-item{
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0px;
 }
 .color-item p{
     font-size: 16px;
@@ -92,8 +158,65 @@ body {
     display: inline-block;
 }
 
+.even-odd-item{
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
 
+.high-low-item{
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
 
+.number-item{
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+.choise-button{
+    background-color: #3F1B12;
+    width: 70px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 16px;
+    font-family: inherit;
+    color: white;
+    border: none;
+    cursor: pointer;
+
+}
+.bet-button{
+    margin-left: 50px;
+    background-color: #3F1B12;
+    width: 160px;
+    height: 40px;
+    font-size: 24px;
+    border-radius: 16px;
+    font-family: 'CupheadFont', sans-serif;
+    color: white;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+.money_icon{
+    width: 25px;
+    height: 25px;
+}
+.input-box input{
+    height: 30px;
+    width: 200px;
+    padding: 0 15px;
+    max-width: 200px;
+    font-family: inherit;
+    background-color: #E6DDCF;
+    outline: none;
+    border-radius: 8px;
+    border: none;
+
+}
   @keyframes spin {
     from {
         transform:rotate(0deg);
