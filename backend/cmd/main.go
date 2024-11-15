@@ -28,6 +28,8 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(cors.Handler(corsOptions))
 
+	r.Get("/api/healthcheck", api.Healthcheck)
+
 	r.Post("/api/login", api.Login)
 	r.Get("/api/leaderboard", api.GetLeaderboard)
 
