@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/alik-r/casino-roulette/backend/pkg/auth"
 	"github.com/alik-r/casino-roulette/backend/pkg/db"
@@ -56,6 +57,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 			if loginRequest.Avatar == "" {
 				loginRequest.Avatar = "images/avatars/avatar1.png"
+			} else {
+				loginRequest.Avatar = "images/avatars/" + strings.Split(loginRequest.Avatar, "images/avatars/")[1]
 			}
 
 			user = models.User{
