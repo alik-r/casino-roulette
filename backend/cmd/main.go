@@ -34,7 +34,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth)
 		r.Post("/api/user/deposit", api.Deposit)
-		r.Post("/api/roulette/bet", api.PlaceBet)
+		r.Post("/api/roulette", api.PlaceBet)
 	})
 
 	log.Println("Server running on port 8080")

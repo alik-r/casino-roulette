@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -26,8 +27,9 @@ type DepositRequest struct {
 }
 
 type BetRequest struct {
-	BetAmount int    `json:"bet_amount"`
-	BetColor  string `json:"bet_color"`
+	BetAmount int         `json:"bet_amount"`
+	BetType   string      `json:"bet_type"`
+	BetValue  interface{} `json:"bet_value"`
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +97,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Deposit(w http.ResponseWriter, r *http.Request) {
 	username, ok := r.Context().Value(middleware.UsernameKey).(string)
 	if !ok || username == "" {
-		http.Error(w, "missing username", http.StatusBadRequest)
+		http.Error(w, "Unauthenticated user", http.StatusForbidden)
 		return
 	}
 
@@ -137,19 +139,25 @@ func Deposit(w http.ResponseWriter, r *http.Request) {
 func PlaceBet(w http.ResponseWriter, r *http.Request) {
 	username, ok := r.Context().Value(middleware.UsernameKey).(string)
 	if !ok || username == "" {
-		http.Error(w, "missing username", http.StatusBadRequest)
+		http.Error(w, "Unauthenticated user", http.StatusForbidden)
 		return
 	}
 
 	var betRequest BetRequest
 	err := json.NewDecoder(r.Body).Decode(&betRequest)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	if betRequest.BetAmount <= 0 || !roulette.IsValidColor(betRequest.BetColor) {
-		http.Error(w, "invalid bet amount or color", http.StatusBadRequest)
+	if betRequest.BetAmount <= 0 {
+		http.Error(w, "Bet amount must be greater than zero", http.StatusBadRequest)
+		return
+	}
+
+	if !roulette.IsValidBet(roulette.BetType(betRequest.BetType), betRequest.BetValue) {
+		log.Println("Invalid bet type or value:", betRequest.BetType, roulette.BetType(betRequest.BetType), betRequest.BetValue)
+		http.Error(w, "Invalid bet type or value", http.StatusBadRequest)
 		return
 	}
 
@@ -157,54 +165,88 @@ func PlaceBet(w http.ResponseWriter, r *http.Request) {
 	err = db.DB.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			http.Error(w, "user not found", http.StatusNotFound)
+			http.Error(w, "User not found", http.StatusNotFound)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		log.Println("Database error in PlaceBet:", err)
 		return
 	}
 
 	if user.Balance < betRequest.BetAmount {
-		http.Error(w, "insufficient balance", http.StatusBadRequest)
+		http.Error(w, "Insufficient balance", http.StatusBadRequest)
 		return
 	}
 
 	result := roulette.Spin()
-	payout := roulette.Payout(betRequest.BetColor, string(result.Color))
+
+	payoutMultiplier := roulette.Payout(roulette.BetType(betRequest.BetType), betRequest.BetValue, result)
+	var payout int
 	var betResult string
-	if payout > 0 {
-		user.Balance += betRequest.BetAmount * (payout - 1)
+	if payoutMultiplier > 0 {
+		payout = betRequest.BetAmount * payoutMultiplier
+		user.Balance += payout
 		betResult = "win"
 	} else {
+		payout = 0
 		user.Balance -= betRequest.BetAmount
 		betResult = "lose"
 	}
 
 	if err := db.DB.Save(&user).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to update user balance", http.StatusInternalServerError)
+		return
+	}
+
+	var betValueStr string
+	switch betRequest.BetType {
+	case "color", "evenodd", "highlow":
+		value, ok := betRequest.BetValue.(string)
+		if !ok {
+			log.Printf("Invalid bet value, expected string, got %T", betRequest.BetValue)
+			http.Error(w, "Invalid bet value", http.StatusBadRequest)
+			return
+		}
+		betValueStr = value
+	case "number":
+		value, ok := betRequest.BetValue.(float64)
+		if !ok {
+			log.Printf("Invalid bet value, expected float64, got %T", betRequest.BetValue)
+			http.Error(w, "Invalid bet value", http.StatusBadRequest)
+			return
+		}
+		betValueStr = strconv.Itoa(int(value))
+	default:
+		log.Println("Invalid bet type:", betRequest.BetType)
+		http.Error(w, "Invalid bet type", http.StatusBadRequest)
 		return
 	}
 
 	bet := models.Bet{
 		UserID:    user.ID,
 		BetAmount: betRequest.BetAmount,
-		BetColor:  betRequest.BetColor,
+		BetType:   betRequest.BetType,
+		BetValue:  betValueStr,
+		Payout:    payout,
 		Result:    betResult,
 	}
 
 	if err := db.DB.Create(&bet).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to record bet", http.StatusInternalServerError)
 		return
 	}
 
 	response := map[string]interface{}{
-		"username":     user.Username,
-		"balance":      user.Balance,
-		"bet_amount":   bet.BetAmount,
-		"bet_color":    bet.BetColor,
-		"result":       bet.Result,
-		"result_color": result.Color,
+		"balance":       user.Balance,
+		"bet_amount":    bet.BetAmount,
+		"bet_type":      bet.BetType,
+		"bet_value":     bet.BetValue,
+		"payout":        bet.Payout,
+		"result":        bet.Result,
+		"result_color":  result.Color,
+		"result_number": result.Number,
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)

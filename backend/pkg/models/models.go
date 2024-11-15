@@ -20,7 +20,9 @@ type Bet struct {
 	UserID    uint      `json:"user_id"`
 	User      User      `gorm:"foreignKey:UserID" json:"-"`
 	BetAmount int       `json:"bet_amount"`
-	BetColor  string    `json:"bet_color"`
+	BetType   string    `json:"bet_type"`
+	BetValue  string    `json:"bet_value"`
+	Payout    int       `json:"payout"`
 	Result    string    `json:"result"`
 	CreatedAt time.Time `json:"-" gorm:"autoCreateTime"`
 }
