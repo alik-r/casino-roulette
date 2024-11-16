@@ -127,7 +127,7 @@
         </div>
 
         <!-- Response Display -->
-        <div class="bet-result" x-show="betResult.result !== ''">
+        <!-- <div class="bet-result" x-show="betResult.result !== ''">
             <h3>Bet Result</h3>
             <p>Balance: <span x-text="betResult.balance"></span></p>
             <p>Bet Amount: <span x-text="betResult.bet_amount"></span></p>
@@ -137,7 +137,7 @@
             <p>Result: <span x-text="betResult.result"></span></p>
             <p>Result Color: <span x-text="betResult.result_color"></span></p>
             <p>Result Number: <span x-text="betResult.result_number"></span></p>
-        </div>
+        </div> -->
 
         <form class="bet_form">
             <p class="input-label">By color</p>
@@ -200,7 +200,7 @@
             <div class="bet-category">
                 <div class="number-item">
                     <div class="input-box">
-                        <input type="number" name="bet_number" placeholder="Enter Number" required>
+                        <input type="number" name="bet_number" placeholder="Numbers: 0-36" required>
                     </div>
                     <p class="money_icon"> <img src="images/money_icon.png"></p>
                     <p>1:35</p>
@@ -210,6 +210,49 @@
     </section>
 
     <script>
+        function changeBalanceColor(color) {
+            const balanceElement = document.querySelector('.souls-amount');
+            const originalColor = "#3F1B12";
+
+            balanceElement.style.color = color;
+
+            setTimeout(() => {
+                balanceElement.style.color = originalColor;
+            }, 3000);
+        }
+
+        const numbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+        const angles = {};
+        numbers.forEach((num, index) => {
+            angles[num] = index * 9.72972972972973;
+        });
+
+        function spinRoulette(number, isWin) {
+            const targetAngle = angles[number];
+            console.log("Target angle:", targetAngle);
+            if (targetAngle === undefined) {
+                console.error("Invalid number:", number);
+                return;
+            }
+
+            const rouletteCircle = document.querySelector('.roulette_circle img');
+
+            rouletteCircle.style.transition = 'none';
+            rouletteCircle.style.transform = 'rotate(0deg)';
+
+            setTimeout(() => {
+                const duration = 3000;
+                const fullRotations = 5;
+                const finalRotation = fullRotations * 360 + (360 - targetAngle);
+
+                rouletteCircle.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+                rouletteCircle.style.transform = `rotate(${finalRotation}deg)`;
+                setTimeout(() => {
+                    changeBalanceColor(isWin ? "#00B321" : "#F40001");
+                }, duration);
+            }, 50);
+        }
+
         function rouletteApp() {
             return {
                 selectedBetType: '',
@@ -325,6 +368,8 @@
                             console.log("response json", data);
                             this.betResult = data;
                             this.user.balance = data.balance;
+                            const isWin = data.result === 'win';
+                            spinRoulette(data.result_number, isWin);
                             document.querySelector('.souls-amount').textContent = this.user.balance;
                             form.reset();
                             this.selectedBetType = '';

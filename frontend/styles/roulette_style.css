@@ -47,6 +47,7 @@ body {
     font-weight: bold;
     font-family: 'Gabarito', monospace;
     color: #3F1B12;
+    transition: color 0.5s ease;
 }
 
 /* Icon styling */
