@@ -31,12 +31,13 @@ func main() {
 	r.Get("/api/healthcheck", api.Healthcheck)
 
 	r.Post("/api/login", api.Login)
-	r.Get("/api/leaderboard", api.GetLeaderboard)
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth)
+		r.Get("/api/user", api.GetUser)
 		r.Post("/api/user/deposit", api.Deposit)
-		r.Post("/api/roulette/bet", api.PlaceBet)
+		r.Get("/api/leaderboard", api.GetLeaderboard)
+		r.Post("/api/roulette", api.PlaceBet)
 	})
 
 	log.Println("Server running on port 8080")

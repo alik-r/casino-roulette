@@ -1,17 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="rouletteApp()" x-init="loadUser()">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap">
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="styles/roulette_style.css">
     <title>Casino</title>
 </head>
+
 <body>
-    <div class="title">ROULLETTE</div>
+    <header class="site-header">
+        <div class="header-section header-left">
+            <div class="icon-with-label">
+                <button class="icon-button" title="Logout" @click="logout">
+                    <img src="images/logout_icon.png" alt="Logout Icon">
+                </button>
+                <p>Logout</p>
+            </div>
+            <div class="icon-with-label">
+                <button class="icon-button" title="User">
+                    <img src="images/user_icon.png" alt="User Icon">
+                </button>
+                <p class="username">User</p>
+            </div>
+        </div>
+
+        <div class="header-title">ROULLETTE</div>
+
+        <div class="header-section header-right">
+            <div class="icon-with-label">
+                <button class="icon-button" title="Icon 3">
+                    <img src="images/roullete_icon.png" alt="Roullette Icon">
+                </button>
+                <p>Roullette</p>
+            </div>
+            <div class="icon-with-label">
+                <button class="icon-button" title="Icon 4">
+                    <img src="images/leaderboard_icon.png" alt="Leaderboard Icon">
+                </button>
+                <p>Leaderboard</p>
+            </div>
+        </div>
+    </header>
+
     <section class="container">
-        <p> Your souls</p>
-        <b class="num_souls">49991</b>
+        <div class="souls">
+            <p class="souls-title">Your Souls</p>
+            <div class="souls-display">
+                <p class="souls-amount" x-text="user.balance">1000</p>
+                <img src="images/soul_icon.png" alt="Soul Icon" class="soul-icon">
+            </div>
+        </div>
+
         <div class="roulette_container">
             <div class="roulette_circle">
                 <img src="images/roulette_circle.png" alt="">
@@ -20,33 +64,332 @@
                 <img src="images/roulette_arrow.png.png" alt="">
             </div>
         </div>
-        <p>Your bet</p>
+
+        <!-- Unified Bet Form -->
+        <div class="your-bet">
+            <h2 class="your-bet-title">Your Bet</h2>
+            <form @submit.prevent="submitBet" hx-post="/api/roulette"
+                :hx-headers="JSON.stringify({ Authorization: `Bearer ${authToken}` })" hx-trigger="submit"
+                hx-include="[name='bet_amount'], [name='bet_type'], [name='bet_value'], [name='bet_number']"
+                hx-swap="none" class="bet-form">
+                <!-- Bet Amount -->
+                <div class="form-group">
+                    <label for="bet-amount">Bet Amount:</label>
+                    <input type="number" id="bet-amount" name="bet_amount" placeholder="Enter your bet amount" required>
+                </div>
+
+                <!-- Bet Type -->
+                <div class="form-group">
+                    <label for="bet-type">Bet Type:</label>
+                    <select id="bet-type" name="bet_type" x-model="selectedBetType" required>
+                        <option value="" disabled selected>Select Bet Type</option>
+                        <option value="color">Color</option>
+                        <option value="evenodd">Even/Odd</option>
+                        <option value="highlow">High/Low</option>
+                        <option value="number">Specific Number</option>
+                    </select>
+                </div>
+
+                <!-- Bet Value Options -->
+                <div class="form-group" x-show="selectedBetType === 'color'">
+                    <label for="bet-value-color">Choose Color:</label>
+                    <select id="bet-value-color" name="bet_value" x-bind:disabled="selectedBetType !== 'color'">
+                        <option value="red">Red</option>
+                        <option value="black">Black</option>
+                        <option value="green">Green</option>
+                    </select>
+                </div>
+
+                <div class="form-group" x-show="selectedBetType === 'evenodd'">
+                    <label for="bet-value-evenodd">Choose:</label>
+                    <select id="bet-value-evenodd" name="bet_value" x-bind:disabled="selectedBetType !== 'evenodd'">
+                        <option value="even">Even</option>
+                        <option value="odd">Odd</option>
+                    </select>
+                </div>
+
+                <div class="form-group" x-show="selectedBetType === 'highlow'">
+                    <label for="bet-value-highlow">Choose:</label>
+                    <select id="bet-value-highlow" name="bet_value" x-bind:disabled="selectedBetType !== 'highlow'">
+                        <option value="high">19-36</option>
+                        <option value="low">1-18</option>
+                    </select>
+                </div>
+
+                <div class="form-group" x-show="selectedBetType === 'number'">
+                    <label for="bet-number">Enter Number (0-36):</label>
+                    <input type="number" id="bet-number" name="bet_number" min="0" max="36" placeholder="Enter Number"
+                        required x-bind:disabled="selectedBetType !== 'number'">
+                </div>
+                <!-- Submit Button -->
+                <button type="submit" class="bet-button">Bet</button>
+            </form>
+        </div>
+
+        <!-- Response Display -->
+        <!-- <div class="bet-result" x-show="betResult.result !== ''">
+            <h3>Bet Result</h3>
+            <p>Balance: <span x-text="betResult.balance"></span></p>
+            <p>Bet Amount: <span x-text="betResult.bet_amount"></span></p>
+            <p>Bet Type: <span x-text="betResult.bet_type"></span></p>
+            <p>Bet Value: <span x-text="betResult.bet_value"></span></p>
+            <p>Payout: <span x-text="betResult.payout"></span></p>
+            <p>Result: <span x-text="betResult.result"></span></p>
+            <p>Result Color: <span x-text="betResult.result_color"></span></p>
+            <p>Result Number: <span x-text="betResult.result_number"></span></p>
+        </div> -->
+
         <form class="bet_form">
-            <p>By color</p>
-            <div class="input-color">
+            <p class="input-label">By color</p>
+            <div class="bet-category">
                 <div class="color-item">
                     <span class="dot" style="background-color: #F40001;"></span>
                     <p>Red</p>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:1</p>
                 </div>
 
                 <div class="color-item">
                     <span class="dot" style="background-color: #080002;"></span>
                     <p>Black</p>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:1</p>
                 </div>
 
                 <div class="color-item">
                     <span class="dot" style="background-color: #03AA52;"></span>
                     <p>Green</p>
-                    <p > <img src="/images/money_icon.png"></p>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
                     <p>35:1</p>
                 </div>
 
             </div>
-                    
-            
-                
+            <p class="input-label">Even/Odd</p>
+
+
+            <div class="bet-category">
+                <div class="even-odd-item">
+                    <button class="choise-button">Even</button>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:1</p>
+                </div>
+
+                <div class="even-odd-item">
+                    <button class="choise-button">Odd</button>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:1</p>
+                </div>
+
+            </div>
+            <p class="input-label">High/Low</p>
+            <div class="bet-category">
+                <div class="high-low-item">
+                    <button class="choise-button">1-18</button>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:1</p>
+                </div>
+
+                <div class="high-low-item">
+                    <button class="choise-button">19-36</button>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:1</p>
+                </div>
+
+            </div>
+            <p class="input-label">Specific Number</p>
+            <div class="bet-category">
+                <div class="number-item">
+                    <div class="input-box">
+                        <input type="number" name="bet_number" placeholder="Numbers: 0-36" required>
+                    </div>
+                    <p class="money_icon"> <img src="images/money_icon.png"></p>
+                    <p>1:35</p>
+                </div>
+            </div>
         </form>
-        
     </section>
+
+    <script>
+        function changeBalanceColor(color) {
+            const balanceElement = document.querySelector('.souls-amount');
+            const originalColor = "#3F1B12";
+
+            balanceElement.style.color = color;
+
+            setTimeout(() => {
+                balanceElement.style.color = originalColor;
+            }, 3000);
+        }
+
+        const numbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+        const angles = {};
+        numbers.forEach((num, index) => {
+            angles[num] = index * 9.72972972972973;
+        });
+
+        function spinRoulette(number, isWin) {
+            const targetAngle = angles[number];
+            console.log("Target angle:", targetAngle);
+            if (targetAngle === undefined) {
+                console.error("Invalid number:", number);
+                return;
+            }
+
+            const rouletteCircle = document.querySelector('.roulette_circle img');
+
+            rouletteCircle.style.transition = 'none';
+            rouletteCircle.style.transform = 'rotate(0deg)';
+
+            setTimeout(() => {
+                const duration = 3000;
+                const fullRotations = 5;
+                const finalRotation = fullRotations * 360 + (360 - targetAngle);
+
+                rouletteCircle.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.1, 0.25, 1)`;
+                rouletteCircle.style.transform = `rotate(${finalRotation}deg)`;
+                setTimeout(() => {
+                    changeBalanceColor(isWin ? "#00B321" : "#F40001");
+                }, duration);
+            }, 50);
+        }
+
+        function rouletteApp() {
+            return {
+                selectedBetType: '',
+                betResult: {
+                    balance: 0,
+                    bet_amount: 0,
+                    bet_type: '',
+                    bet_value: '',
+                    payout: 0,
+                    result: '',
+                    result_color: '',
+                    result_number: 0
+                },
+                user: {
+                    avatar: '',
+                    balance: 0,
+                    email: '',
+                    username: ''
+                },
+                authToken: localStorage.getItem('authToken') || '',
+
+                loadUser() {
+                    if (!this.authToken) {
+                        alert('No auth token found. Please log in.');
+                        window.location.href = '/register.html';
+                    }
+                    fetch('/api/user', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${this.authToken}`
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            this.user = data;
+                            document.querySelector('.souls-amount').textContent = this.user.balance;
+                            document.querySelector('.username').textContent = this.user.username;
+                        })
+                        .catch(err => {
+                            console.error('Error fetching user data:', err);
+                        });
+                },
+
+                submitBet(event) {
+                    event.preventDefault();
+                    const form = event.target;
+                    const formData = new FormData(form);
+
+                    const payload = {
+                        bet_amount: Number(formData.get('bet_amount')),
+                        bet_type: formData.get('bet_type'),
+                        bet_value: formData.get('bet_value') || formData.get('bet_number')
+                    };
+
+                    if (!payload.bet_amount || payload.bet_amount <= 0) {
+                        alert('Please enter a valid bet amount.');
+                        return;
+                    }
+
+                    console.log("payload", payload);
+                    switch (payload.bet_type) {
+                        case 'color':
+                            if (!['red', 'black', 'green'].includes(payload.bet_value)) {
+                                alert('Invalid value for Color bet. Choose Red, Black, or Green.');
+                                return;
+                            }
+                            break;
+                        case 'evenodd':
+                            if (!['even', 'odd'].includes(payload.bet_value)) {
+                                console.log("Payload value:", payload.bet_value);
+                                alert('Invalid value for Even/Odd bet. Choose Even or Odd.');
+                                return;
+                            }
+                            break;
+                        case 'highlow':
+                            if (!['high', 'low'].includes(payload.bet_value)) {
+                                alert('Invalid value for High/Low bet. Choose High or Low.');
+                                return;
+                            }
+                            break;
+                        case 'number':
+                            const betNumber = Number(formData.get('bet_number'));
+                            if (isNaN(betNumber) || betNumber < 0 || betNumber > 36) {
+                                alert('Invalid number for Specific Number bet. Choose a number between 0 and 36.');
+                                return;
+                            }
+                            payload.bet_value = betNumber;
+                            break;
+                        default:
+                            alert('Invalid bet type.');
+                            return;
+                    }
+
+                    console.log('Payload:', payload);
+
+                    fetch('/api/roulette', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.authToken}`
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => {
+                                    throw new Error(err.message || "Failed to submit bet.");
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("response json", data);
+                            this.betResult = data;
+                            this.user.balance = data.balance;
+                            const isWin = data.result === 'win';
+                            spinRoulette(data.result_number, isWin);
+                            document.querySelector('.souls-amount').textContent = this.user.balance;
+                            form.reset();
+                            this.selectedBetType = '';
+                        })
+                        .catch(err => {
+                            console.error('Error submitting bet:', err);
+                        });
+                },
+
+                fetchUser() {
+                    this.loadUser();
+                },
+
+                logout() {
+                    localStorage.removeItem('authToken');
+                    window.location.href = '/register.html'; // Redirect to login page
+                }
+            }
+        }
+    </script>
 </body>
+
 </html>

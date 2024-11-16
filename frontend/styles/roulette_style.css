@@ -2,26 +2,192 @@
     font-family: 'CupheadFont';
     src: url(../fonts/CupheadPoster-Regular.ttf);
 }
+
 body {
+    box-sizing: border-box;
     background-color: #FED119;
     font-family: 'Gabarito', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 100vh;
-    width: 100%;
+    width: 100vw;
 }
-.title{
+
+
+/* Your Souls */
+/* Container styling for the souls section */
+.souls {
+    width: 160px;
+    margin: 2px auto;
+    padding: 2px;
+    text-align: center;
+    font-family: 'Gabarito', sans-serif;
+}
+
+/* Title styling */
+.souls-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #3F1B12; 
+    margin-bottom: 2px;
+}
+
+/* Display container for amount and icon */
+.souls-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Amount styling */
+.souls-amount {
+    font-size: 1.5em;
+    font-weight: bold;
+    font-family: 'Gabarito', monospace;
+    color: #3F1B12;
+    transition: color 0.5s ease;
+}
+
+/* Icon styling */
+.soul-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+}
+
+/* END Your Souls */
+
+/* Your bet form */
+.your-bet {
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    font-family: 'Gabarito', sans-serif;
+}
+
+.your-bet-title {
+    font-size: 1.5em;
+    margin-bottom: 6px;
+    text-align: center;
+    color: #3F1B12;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #3F1B12;
+}
+
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+button.bet-button {
+    background-color: #3F1B12;
+    color: white;
+    font-family: 'CupheadFont', sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-top: 12px;
+    padding: 6px 40px;
+    text-align: center;
+}
+
+button.bet-button:hover {
+    background-color: #652515;
+}
+
+/* end Your Bet */
+
+/* header */
+.site-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: white;
+    gap: 50px;
+    padding: 10px 20px;
+    height: 60px;
+    font-family: inherit;
+}
+
+.header-section {
+    display: flex;
+    gap: 50px;
+    padding: 40px;
+}
+
+.icon-with-label {
+    margin-top: 20px;
+    width: 50px;
+
+    font-family: inherit;
+    color: #3F1B12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.icon-button img {
+    width: 32px;
+    height: 32px;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.header-title {
     font-family: 'CupheadFont', sans-serif;
     font-size: 48px;
+    color: #3F1B12;
+    flex-grow: 1;
+    text-align: center;
 }
-.container{
+
+/* END header */
+
+.container {
     text-align: center;
     font-size: 24px;
 }
+
 .roulette_container {
     position: relative;
-    /* Adjust to match the circle image size */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,61 +196,73 @@ body {
 }
 
 .roulette_circle img {
-    width: 50%; /* Ensures the image takes up the full container */
+    width: 50%;
     height: auto;
     animation: none;
     animation-duration: 5000ms;
     animation-iteration-count: infinite;
-    animation-timing-function: linear; 
+    animation-timing-function: linear;
 }
-.roulette_arrow img{
+
+.roulette_arrow img {
     width: 20%;
     height: auto;
 }
+
 .roulette_arrow {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -90%); /* Center align with slight upward adjustment */
-    width: 20%; /* Adjust as needed for size */
+    transform: translate(-50%, -90%);
+    width: 20%;
 }
-.bet_form{
+
+.bet_form {
     background-color: #FFF0B3;
     width: 100%;
-    height: 300px;
+    height: 400px;
     text-align: center;
     font-family: inherit;
     border-radius: 8px;
-    
+    padding-bottom: 10px;
     margin-top: 10px;
+    margin-bottom: 10px;
 }
-.bet_form p{
+
+.bet_form p {
     display: flex;
-    margin: 10px;
+    margin: 5px;
     font-size: 28px;
-   
 }
-.input-box label{
+
+.input-box label {
     font-size: 24px;
-
 }
 
-.input-color{
+.bet-category {
     display: flex;
-    padding-left: 15px;
-    gap: 20px;
+    padding-left: 20px;
+    gap: 10px;
 
 }
-.color-item{
+
+.input-label {
+    padding-left: 15px;
+    padding-top: 15px;
+    margin: 0px;
+}
+
+.color-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0px;
 }
-.color-item p{
+
+.color-item p {
     font-size: 16px;
 }
 
-.dot{
+.dot {
     height: 25px;
     width: 25px;
     background-color: #080002;
@@ -92,13 +270,60 @@ body {
     display: inline-block;
 }
 
+.even-odd-item {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
 
+.high-low-item {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
 
-  @keyframes spin {
+.number-item {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+
+.choise-button {
+    background-color: #3F1B12;
+    width: 70px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 16px;
+    font-family: inherit;
+    color: white;
+    border: none;
+    cursor: pointer;
+
+}
+
+.money_icon {
+    width: 25px;
+    height: 25px;
+}
+
+.input-box input {
+    height: 30px;
+    width: 200px;
+    padding: 0 15px;
+    max-width: 200px;
+    font-family: inherit;
+    background-color: #E6DDCF;
+    outline: none;
+    border-radius: 8px;
+    border: none;
+}
+
+@keyframes spin {
     from {
-        transform:rotate(0deg);
+        transform: rotate(0deg);
     }
+
     to {
-        transform:rotate(360deg);
+        transform: rotate(360deg);
     }
-}   
+}
