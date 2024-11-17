@@ -1,21 +1,4 @@
-@font-face {
-    font-family: 'CupheadFont';
-    src: url(../fonts/CupheadPoster-Regular.ttf);
-}
-
-body {
-    box-sizing: border-box;
-    background-color: #FED119;
-    font-family: 'Gabarito', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-}
-
-
-/* Your Souls */
+/* BEGIN Your Souls */
 /* Container styling for the souls section */
 .souls {
     width: 160px;
@@ -59,7 +42,7 @@ body {
 
 /* END Your Souls */
 
-/* Your bet form */
+/* BEGIN Your bet form */
 .your-bet {
     width: 300px;
     margin: 20px auto;
@@ -114,72 +97,7 @@ button.bet-button:hover {
     background-color: #652515;
 }
 
-/* end Your Bet */
-
-/* header */
-.site-header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: white;
-    gap: 50px;
-    padding: 10px 20px;
-    height: 60px;
-    font-family: inherit;
-}
-
-.header-section {
-    display: flex;
-    gap: 50px;
-    padding: 40px;
-}
-
-.icon-with-label {
-    margin-top: 20px;
-    width: 50px;
-
-    font-family: inherit;
-    color: #3F1B12;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.icon-button img {
-    width: 32px;
-    height: 32px;
-}
-
-.icon-button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.icon-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    transition: background-color 0.3s ease;
-}
-
-.header-title {
-    font-family: 'CupheadFont', sans-serif;
-    font-size: 48px;
-    color: #3F1B12;
-    flex-grow: 1;
-    text-align: center;
-}
-
-/* END header */
+/* END Your Bet */
 
 .container {
     text-align: center;
