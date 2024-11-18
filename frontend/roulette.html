@@ -368,10 +368,12 @@
                         .then(data => {
                             console.log("response json", data);
                             this.betResult = data;
-                            this.user.balance = data.balance;
                             const isWin = data.result === 'win';
                             spinRoulette(data.result_number, isWin);
-                            document.querySelector('.souls-amount').textContent = this.user.balance;
+                            setTimeout(() => {
+                                this.user.balance = data.balance;
+                                document.querySelector('.souls-amount').textContent = this.user.balance;
+                            }, 3000);
                             form.reset();
                             this.selectedBetType = '';
                         })
