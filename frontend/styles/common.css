@@ -68,6 +68,9 @@ body {
     height: 40px;
     border-radius: 50%;
     transition: background-color 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    flex-direction: column;
 }
 
 .header-title {

@@ -17,33 +17,33 @@
     <header class="site-header">
         <div class="header-section header-left">
             <div class="icon-with-label">
-                <button class="icon-button" title="Logout" @click="logout">
+                <a href="/register" class="icon-button" title="Logout" @click="logout">
                     <img src="images/logout_icon.png" alt="Logout Icon">
-                </button>
-                <p>Logout</p>
+                    <p>Logout</p>
+                </a>
             </div>
             <div class="icon-with-label">
-                <button class="icon-button" title="User">
+                <a href="/profile" class="icon-button" title="User">
                     <img src="images/user_icon.png" alt="User Icon">
-                </button>
-                <p class="username">User</p>
+                    <p x-text="user.username">User</p>
+                </a>
             </div>
         </div>
 
-        <div class="header-title">ROULLETTE</div>
+        <div class="header-title">ROULETTE</div>
 
         <div class="header-section header-right">
             <div class="icon-with-label">
-                <button class="icon-button" title="Icon 3">
+                <a href="/roulette" class="icon-button" title="Roullette">
                     <img src="images/roullete_icon.png" alt="Roullette Icon">
-                </button>
-                <p>Roullette</p>
+                    <p>Roullette</p>
+                </a>
             </div>
             <div class="icon-with-label">
-                <button class="icon-button" title="Icon 4">
+                <a href="/leaderboard" class="icon-button" title="Leaderboard">
                     <img src="images/leaderboard_icon.png" alt="Leaderboard Icon">
-                </button>
-                <p>Leaderboard</p>
+                    <p>Leaderboard</p>
+                </a>
             </div>
         </div>
     </header>
