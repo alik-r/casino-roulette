@@ -1,0 +1,152 @@
+@font-face {
+    font-family: 'CupheadFont';
+    src: url(../fonts/CupheadPoster-Regular.ttf);
+}
+
+body {
+    box-sizing: border-box;
+    background-color: #FED119;
+    font-family: 'Gabarito', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.site-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.leaderboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    min-width: 400px;
+    background-color: #FFF0B3;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.leaderboard-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3F1B12;
+    margin-bottom: 15px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: auto;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.highlight-row {
+    background-color: #3F1B12 !important;
+    color: #FFF !important;
+}
+
+.highlight-row .leaderboard-cell,
+.highlight-row .rank,
+.highlight-row .username,
+.highlight-row .balance {
+    color: #FFF !important;
+}
+
+.leaderboard-cell {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3F1B12;
+    flex: 1;
+    text-align: center;
+}
+
+.rank {
+    text-align: left;
+    flex: 0.5;
+}
+
+.username {
+    flex: 2;
+    text-align: left;
+    padding-left: 10px;
+}
+
+.balance {
+    text-align: right;
+    flex: 1;
+}
+
+.leaderboard-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.skull-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* BEGIN Your Souls */
+/* Container styling for the souls section */
+.souls {
+    width: 160px;
+    margin: 2px auto;
+    padding: 2px;
+    text-align: center;
+    font-family: 'Gabarito', sans-serif;
+}
+
+/* Title styling */
+.souls-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #3F1B12; 
+    margin-bottom: 2px;
+}
+
+/* Display container for amount and icon */
+.souls-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Amount styling */
+.souls-amount {
+    font-size: 1.5em;
+    font-weight: bold;
+    font-family: 'Gabarito', monospace;
+    color: #3F1B12;
+    transition: color 0.5s ease;
+}
+
+/* Icon styling */
+.soul-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+}
+
+/* END Your Souls */

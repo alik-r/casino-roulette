@@ -5,6 +5,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY ./index.html /usr/share/nginx/html/index.html
 COPY ./register.html /usr/share/nginx/html/register.html
 COPY ./roulette.html /usr/share/nginx/html/roulette.html
+COPY ./leaderboard.html /usr/share/nginx/html/leaderboard.html
 
 COPY ./style.css /usr/share/nginx/html/style.css
 COPY ./styles/ /usr/share/nginx/html/styles/
