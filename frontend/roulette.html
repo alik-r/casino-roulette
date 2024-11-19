@@ -278,7 +278,7 @@
                 loadUser() {
                     if (!this.authToken) {
                         alert('No auth token found. Please log in.');
-                        window.location.href = '/register.html';
+                        window.location.href = '/register';
                     }
                     fetch('/api/user', {
                         method: 'GET',
@@ -286,11 +286,15 @@
                             'Authorization': `Bearer ${this.authToken}`
                         }
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             this.user = data;
-                            // document.querySelector('.souls-amount').textContent = this.user.balance;
-                            // document.querySelector('.username').textContent = this.user.username;
                         })
                         .catch(err => {
                             console.error('Error fetching user data:', err);
@@ -358,6 +362,11 @@
                         body: JSON.stringify(payload)
                     })
                         .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            
                             if (!response.ok) {
                                 return response.json().then(err => {
                                     throw new Error(err.message || "Failed to submit bet.");
@@ -381,14 +390,9 @@
                             console.error('Error submitting bet:', err);
                         });
                 },
-
-                fetchUser() {
-                    this.loadUser();
-                },
-
                 logout() {
                     localStorage.removeItem('authToken');
-                    window.location.href = '/register.html'; // Redirect to login page
+                    window.location.href = '/register.html';
                 }
             }
         }

@@ -86,23 +86,40 @@
             return {
                 user: { username: '', balance: 0, avatar: '' },
                 leaderboard: [],
+                authToken: localStorage.getItem('authToken') || '',
                 loadLeaderboard() {
+                    if (!this.authToken) {
+                        alert('No auth token found. Please log in.');
+                        window.location.href = '/register';
+                    }
                     fetch('/api/user', {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                            'Authorization': `Bearer ${this.authToken}`
                         }
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            return response.json();
+                        })
                         .then(data => this.user = data);
 
                     fetch('/api/leaderboard', {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                            'Authorization': `Bearer ${this.authToken}`
                         }
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            return response.json();
+                        })
                         .then(data => this.leaderboard = data);
                 },
                 logout() {

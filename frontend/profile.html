@@ -65,7 +65,8 @@
                 </div>
                 <form class="deposit-form" @submit.prevent="deposit">
                     <label for="deposit-amount">Deposit Amount</label>
-                    <input type="number" id="deposit-amount" x-model="depositAmount" placeholder="Enter amount" required>
+                    <input type="number" id="deposit-amount" x-model="depositAmount" placeholder="Enter amount"
+                        required>
                     <button type="submit" class="deposit-button">Deposit</button>
                 </form>
             </div>
@@ -77,14 +78,25 @@
             return {
                 user: { username: '', balance: 0, avatar: '' },
                 depositAmount: 0,
+                authToken: localStorage.getItem('authToken') || '',
                 loadProfile() {
+                    if (!this.authToken) {
+                        alert('No auth token found. Please log in.');
+                        window.location.href = '/register';
+                    }
                     fetch('/api/user', {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                            'Authorization': `Bearer ${this.authToken}`
                         }
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            return response.json();
+                        })
                         .then(data => this.user = data);
                 },
                 deposit() {
@@ -92,12 +104,18 @@
                     fetch('/api/user/deposit', {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+                            'Authorization': `Bearer ${this.authToken}`,
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ amount: depositAmount })
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             if (data.balance) {
                                 this.user.balance = data.balance;
