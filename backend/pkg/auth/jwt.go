@@ -2,12 +2,22 @@ package auth
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("secret")
+var jwtSecret []byte
+
+func InitJWT() {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		jwtSecret = []byte("default_secret")
+	} else {
+		jwtSecret = []byte(secret)
+	}
+}
 
 func GenerateJWT(username string) (string, error) {
 	claims := jwt.MapClaims{}
