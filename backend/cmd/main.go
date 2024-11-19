@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/alik-r/casino-roulette/backend/pkg/api"
+	"github.com/alik-r/casino-roulette/backend/pkg/auth"
 	"github.com/alik-r/casino-roulette/backend/pkg/db"
 	"github.com/alik-r/casino-roulette/backend/pkg/middleware"
 	"github.com/go-chi/chi/v5"
@@ -15,6 +16,7 @@ func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	db.InitDB()
+	auth.InitJWT()
 
 	corsOptions := cors.Options{
 		AllowedOrigins:   []string{"*"},
