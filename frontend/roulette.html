@@ -123,22 +123,10 @@
                         required x-bind:disabled="selectedBetType !== 'number'">
                 </div>
                 <!-- Submit Button -->
+                <div id="response"></div>
                 <button type="submit" class="bet-button">Bet</button>
             </form>
         </div>
-
-        <!-- Response Display -->
-        <!-- <div class="bet-result" x-show="betResult.result !== ''">
-            <h3>Bet Result</h3>
-            <p>Balance: <span x-text="betResult.balance"></span></p>
-            <p>Bet Amount: <span x-text="betResult.bet_amount"></span></p>
-            <p>Bet Type: <span x-text="betResult.bet_type"></span></p>
-            <p>Bet Value: <span x-text="betResult.bet_value"></span></p>
-            <p>Payout: <span x-text="betResult.payout"></span></p>
-            <p>Result: <span x-text="betResult.result"></span></p>
-            <p>Result Color: <span x-text="betResult.result_color"></span></p>
-            <p>Result Number: <span x-text="betResult.result_number"></span></p>
-        </div> -->
 
         <form class="bet_form">
             <p class="input-label">By color</p>
@@ -211,6 +199,14 @@
     </section>
 
     <script>
+        function displaySubmissionError(message) {
+            const responseElement = document.getElementById('response');
+            responseElement.textContent = message;
+            setTimeout(() => {
+                responseElement.textContent = '';
+            }, 5000);
+        }
+
         function changeBalanceColor(color) {
             const balanceElement = document.querySelector('.souls-amount');
             const originalColor = "#3F1B12";
@@ -278,7 +274,7 @@
                 loadUser() {
                     if (!this.authToken) {
                         alert('No auth token found. Please log in.');
-                        window.location.href = '/register.html';
+                        window.location.href = '/register';
                     }
                     fetch('/api/user', {
                         method: 'GET',
@@ -286,11 +282,15 @@
                             'Authorization': `Bearer ${this.authToken}`
                         }
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+                            return response.json();
+                        })
                         .then(data => {
                             this.user = data;
-                            document.querySelector('.souls-amount').textContent = this.user.balance;
-                            document.querySelector('.username').textContent = this.user.username;
                         })
                         .catch(err => {
                             console.error('Error fetching user data:', err);
@@ -309,7 +309,7 @@
                     };
 
                     if (!payload.bet_amount || payload.bet_amount <= 0) {
-                        alert('Please enter a valid bet amount.');
+                        displaySubmissionError('Invalid bet amount. Please enter a valid amount.');
                         return;
                     }
 
@@ -343,7 +343,7 @@
                             payload.bet_value = betNumber;
                             break;
                         default:
-                            alert('Invalid bet type.');
+                            displaySubmissionError('Invalid bet type. Please select a valid bet type.');
                             return;
                     }
 
@@ -358,8 +358,18 @@
                         body: JSON.stringify(payload)
                     })
                         .then(response => {
+                            if (response.status === 401) {
+                                alert('Invalid auth token. Please log in again.');
+                                window.location.href = '/register';
+                            }
+
                             if (!response.ok) {
+                                if (response.status === 400) {
+                                    displaySubmissionError('Insufficient balance. Please deposit more souls.');
+                                }
+
                                 return response.json().then(err => {
+                                    displaySubmissionError(err.message || "Failed to submit bet.");
                                     throw new Error(err.message || "Failed to submit bet.");
                                 });
                             }
@@ -378,17 +388,13 @@
                             this.selectedBetType = '';
                         })
                         .catch(err => {
+                            displaySubmissionError('Failed to submit bet.');
                             console.error('Error submitting bet:', err);
                         });
                 },
-
-                fetchUser() {
-                    this.loadUser();
-                },
-
                 logout() {
                     localStorage.removeItem('authToken');
-                    window.location.href = '/register.html'; // Redirect to login page
+                    window.location.href = '/register.html';
                 }
             }
         }

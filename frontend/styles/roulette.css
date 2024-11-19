@@ -245,3 +245,9 @@ button.bet-button:hover {
         transform: rotate(360deg);
     }
 }
+
+#response {
+    color: #F40001;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
