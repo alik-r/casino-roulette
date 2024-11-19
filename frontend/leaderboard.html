@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" x-data="leaderboardApp()" x-init="loadLeaderboard()">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito&display=swap">
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/leaderboard.css">
+    <title>Leaderboard</title>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-section header-left">
+            <div class="icon-with-label">
+                <a href="/register" class="icon-button" title="Logout" @click="logout">
+                    <img src="images/logout_icon.png" alt="Logout Icon">
+                    <p>Logout</p>
+                </a>
+            </div>
+            <div class="icon-with-label">
+                <a href="/profile" class="icon-button" title="User">
+                    <img src="images/user_icon.png" alt="User Icon">
+                    <p x-text="user.username">User</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="header-title">LEADERBOARD</div>
+
+        <div class="header-section header-right">
+            <div class="icon-with-label">
+                <a href="/roulette" class="icon-button" title="Roullette">
+                    <img src="images/roullete_icon.png" alt="Roullette Icon">
+                    <p>Roullette</p>
+                </a>
+            </div>
+            <div class="icon-with-label">
+                <a href="/leaderboard" class="icon-button" title="Leaderboard">
+                    <img src="images/leaderboard_icon.png" alt="Leaderboard Icon">
+                    <p>Leaderboard</p>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="souls">
+            <p class="souls-title">Your Souls</p>
+            <div class="souls-display">
+                <p class="souls-amount" x-text="user.balance">1000</p>
+                <img src="images/soul_icon.png" alt="Soul Icon" class="soul-icon">
+            </div>
+        </div>
+
+        <div class="leaderboard">
+            <div class="leaderboard-title">Top 10 Players</div>
+            <div class="leaderboard-table">
+                <template x-for="(player, index) in leaderboard" :key="player.username">
+                    <div class="leaderboard-row" :class="{ 'highlight-row': player.username === user.username }">
+                        <div class="leaderboard-cell rank" x-text="index + 1"></div>
+                        <div class="leaderboard-avatar">
+                            <img :src="player.avatar" alt="Player avatar">
+                        </div>
+                        <div class="leaderboard-cell username" x-text="player.username"></div>
+                        <div class="leaderboard-cell balance">
+                            <template x-if="player.balance === 0">
+                                <img src="images/skull_icon.png" alt="Skull Icon" class="skull-icon">
+                            </template>
+                            <template x-if="player.balance > 0">
+                                <span x-text="player.balance"></span>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function leaderboardApp() {
+            return {
+                user: { username: '', balance: 0, avatar: '' },
+                leaderboard: [],
+                loadLeaderboard() {
+                    fetch('/api/user', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => this.user = data);
+
+                    fetch('/api/leaderboard', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => this.leaderboard = data);
+                },
+                logout() {
+                    localStorage.removeItem('authToken');
+                    window.location.href = '/register.html';
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>
