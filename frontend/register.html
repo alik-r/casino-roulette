@@ -19,7 +19,7 @@
         your soul
     </div>
 
-    <section class="container" x-data="{ isRegister: true }">
+    <section class="container" x-data="{ isRegister: true }" x-bind:style="{ height: isRegister ? '480px' : '250px' }">
         <div class="header">
             <button class="tab" :class="{ 'tab-active': !isRegister }" @click="isRegister = false">Login</button>
             <button class="tab" :class="{ 'tab-active': isRegister }" @click="isRegister = true">Register</button>
