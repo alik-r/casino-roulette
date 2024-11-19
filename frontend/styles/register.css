@@ -20,8 +20,8 @@ body {
 
 .title {
     position: absolute;
-    text-align:  left;
-    margin-bottom:20px;
+    text-align: left;
+    margin-bottom: 20px;
     top: 54px;
     left: 54px;
     font-family: 'CupheadFont', sans-serif;
@@ -35,7 +35,7 @@ body {
 .container {
     position: relative;
     width: 450px;
-    height: 450px;
+    height: 480px;
     background-color: #FFF6E8;
     padding: 25px;
     border-radius: 16px;
@@ -117,7 +117,8 @@ body {
     body {
         padding-left: 30px;
         background-position: right;
-        background-size: 60%; /* Smaller background image */
+        background-size: 60%;
+        /* Smaller background image */
     }
 }
 
@@ -143,7 +144,8 @@ body {
     body {
         padding-left: 10px;
         background-position: right;
-        background-size: 50%; /* Even smaller background image */
+        background-size: 50%;
+        /* Even smaller background image */
     }
 }
 
@@ -177,7 +179,7 @@ body {
 .submit-btn {
     width: 100%;
     padding: 12px;
-    background-color: #e08c25; 
+    background-color: #e08c25;
     color: white;
     font-size: 16px;
     font-family: 'Gabarito', sans-serif;
@@ -189,4 +191,16 @@ body {
 
 .submit-btn:hover {
     background-color: #ff8f07;
+}
+
+.error-message {
+    color: #F40001;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.success-message {
+    color: #03AA52;
+    margin-top: 10px;
+    font-size: 0.9em;
 }

@@ -289,8 +289,8 @@
                         .then(response => response.json())
                         .then(data => {
                             this.user = data;
-                            document.querySelector('.souls-amount').textContent = this.user.balance;
-                            document.querySelector('.username').textContent = this.user.username;
+                            // document.querySelector('.souls-amount').textContent = this.user.balance;
+                            // document.querySelector('.username').textContent = this.user.username;
                         })
                         .catch(err => {
                             console.error('Error fetching user data:', err);

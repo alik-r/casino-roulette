@@ -25,8 +25,9 @@
             <button class="tab" :class="{ 'tab-active': isRegister }" @click="isRegister = true">Register</button>
         </div>
 
-        <form class="container-register" id="register-form" x-show="isRegister" hx-post="/api/login" hx-trigger="submit" hx-target="#response"
-            hx-ext='json-enc' hx-headers='{"Content-Type": "application/json"}'>
+        <form class="container-register" id="register-form" x-show="isRegister" hx-post="/api/register"
+            hx-trigger="submit" hx-target="#response" hx-ext='json-enc'
+            hx-headers='{"Content-Type": "application/json"}'>
 
             <div class="input-box">
                 <label>Username</label>
@@ -47,8 +48,9 @@
             <button class="submit-btn" type="submit">Register</button>
         </form>
 
-        <form class="container-login" id="login-form" x-show="!isRegister" hx-post="/api/login" hx-trigger="submit" hx-include="#login-form"
-            hx-target="#response" hx-headers='{"Content-Type": "application/json"}' hx-ext='json-enc'>
+        <form class="container-login" id="login-form" x-show="!isRegister" hx-post="/api/login" hx-trigger="submit"
+            hx-include="#login-form" hx-target="#response" hx-headers='{"Content-Type": "application/json"}'
+            hx-ext='json-enc'>
             <div class="input-box">
                 <label>Email</label>
                 <input type="email" name="email" required>
@@ -83,23 +85,34 @@
     </script>
     <script>
         document.addEventListener("htmx:afterRequest", (event) => {
+            const responseDiv = document.getElementById("response");
+            responseDiv.classList.remove("error-message", "success-message");
             if (event.detail.successful) {
                 const response = JSON.parse(event.detail.xhr.responseText);
                 if (response.token) {
                     localStorage.setItem("authToken", response.token);
-
-                    if (response.is_register === "true") {
-                        document.getElementById("response").innerText = "Registered successfully!";
+                    responseDiv.classList.add("success-message");
+                    if (response.message) {
+                        responseDiv.innerText = "Registered successfully!";
                     } else {
-                        document.getElementById("response").innerText = "Logged in successfully!";
+                        responseDiv.innerText = "Logged in successfully!";
                     }
-
-                    location.href = "/roulette.html";
+                    setTimeout(() => {
+                        window.location.href = "/roulette";
+                    }, 1000);
                 } else {
-                    document.getElementById("response").innerText = "Failed to login or register.";
+                    console.log("error:", response);
+                    responseDiv.classList.add("error-message");
+                    responseDiv.innerText = response;
                 }
+            } else {
+                const response = event.detail.xhr.responseText;
+                console.log("error:", response);
+                responseDiv.classList.add("error-message");
+                responseDiv.innerText = response;
             }
         });
     </script>
 </body>
+
 </html>

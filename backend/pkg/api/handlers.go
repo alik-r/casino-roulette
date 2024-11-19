@@ -20,6 +20,12 @@ type LoginRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 	Avatar   string `json:"avatar,omitempty"`
 }
 
@@ -36,64 +42,101 @@ type BetRequest struct {
 func Login(w http.ResponseWriter, r *http.Request) {
 	var loginRequest LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
 	var user models.User
-	isRegister := false
-	query := db.DB.Where("email = ?", loginRequest.Email)
+	query := db.DB
 	if loginRequest.Username != "" {
-		query = query.Or("username = ?", loginRequest.Username)
+		query = query.Where("username = ?", loginRequest.Username)
+	} else if loginRequest.Email != "" {
+		query = query.Where("email = ?", loginRequest.Email)
+	} else {
+		http.Error(w, "Username or email is required", http.StatusBadRequest)
+		return
 	}
 
 	err := query.First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			if loginRequest.Username == "" || loginRequest.Email == "" {
-				http.Error(w, "Both username and email are required", http.StatusBadRequest)
-				return
-			}
-
-			if loginRequest.Avatar == "" {
-				loginRequest.Avatar = "images/avatars/avatar1.png"
-			} else {
-				loginRequest.Avatar = "images/avatars/" + strings.Split(loginRequest.Avatar, "images/avatars/")[1]
-			}
-
-			user = models.User{
-				Username: loginRequest.Username,
-				Email:    loginRequest.Email,
-				Avatar:   loginRequest.Avatar,
-				Password: loginRequest.Password,
-				Balance:  1000,
-			}
-			if err := db.DB.Create(&user).Error; err != nil {
-				http.Error(w, "Failed to create user", http.StatusInternalServerError)
-				return
-			}
-			isRegister = true
-		} else {
-			http.Error(w, "Error checking user", http.StatusInternalServerError)
+			http.Error(w, "User not found", http.StatusUnauthorized)
 			return
-		}
-	} else {
-		if user.Password != loginRequest.Password {
-			http.Error(w, "Invalid password", http.StatusBadRequest)
+		} else {
+			http.Error(w, "Database error", http.StatusInternalServerError)
 			return
 		}
 	}
 
+	// TODO: Implement password hashing and verification
+	if user.Password != loginRequest.Password {
+		http.Error(w, "Invalid password", http.StatusUnauthorized)
+		return
+	}
+
 	token, err := auth.GenerateJWT(user.Username)
 	if err != nil {
-		http.Error(w, "Error generating token", http.StatusInternalServerError)
+		http.Error(w, "Token generation failed", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"token":       token,
-		"is_register": strconv.FormatBool(isRegister),
+		"token": token,
+	})
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+	var registerRequest RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&registerRequest); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	var existingUser models.User
+	err := db.DB.Where("email = ?", registerRequest.Email).Or("username = ?", registerRequest.Username).First(&existingUser).Error
+	if err == nil {
+		http.Error(w, "Username or Email already exists", http.StatusConflict)
+		return
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	if registerRequest.Avatar == "" {
+		registerRequest.Avatar = "images/avatars/avatar1.png"
+	} else {
+		parts := strings.Split(registerRequest.Avatar, "images/avatars/")
+		if len(parts) > 1 {
+			registerRequest.Avatar = "images/avatars/" + parts[1]
+		} else {
+			registerRequest.Avatar = "images/avatars/avatar1.png"
+		}
+	}
+
+	newUser := models.User{
+		Username: registerRequest.Username,
+		Email:    registerRequest.Email,
+		Password: registerRequest.Password, // TODO: Hash before storing
+		Avatar:   registerRequest.Avatar,
+		Balance:  1000,
+	}
+
+	if err := db.DB.Create(&newUser).Error; err != nil {
+		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		return
+	}
+
+	token, err := auth.GenerateJWT(newUser.Username)
+	if err != nil {
+		http.Error(w, "Token generation failed", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"token":   token,
+		"message": "Registered successfully",
 	})
 }
 

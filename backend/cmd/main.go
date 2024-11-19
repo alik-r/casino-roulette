@@ -31,6 +31,7 @@ func main() {
 	r.Get("/api/healthcheck", api.Healthcheck)
 
 	r.Post("/api/login", api.Login)
+	r.Post("/api/register", api.Register)
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth)
