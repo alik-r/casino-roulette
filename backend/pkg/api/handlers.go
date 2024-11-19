@@ -68,8 +68,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO: Implement password hashing and verification
-	if user.Password != loginRequest.Password {
+	if !auth.CheckPasswordHash(loginRequest.Password, user.Password) {
 		http.Error(w, "Invalid password", http.StatusUnauthorized)
 		return
 	}
@@ -114,10 +113,17 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	hashedPassword, err := auth.HashPassword(registerRequest.Password)
+	log.Println("original password is ", registerRequest.Password, "hashed password is ", hashedPassword)
+	if err != nil {
+		http.Error(w, "Password hashing failed", http.StatusBadRequest)
+		return
+	}
+
 	newUser := models.User{
 		Username: registerRequest.Username,
 		Email:    registerRequest.Email,
-		Password: registerRequest.Password, // TODO: Hash before storing
+		Password: hashedPassword,
 		Avatar:   registerRequest.Avatar,
 		Balance:  1000,
 	}
