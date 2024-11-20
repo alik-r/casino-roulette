@@ -34,6 +34,8 @@ func main() {
 
 	r.Post("/api/login", api.Login)
 	r.Post("/api/register", api.Register)
+	r.Post("/api/check-account", api.CheckAccount)
+	r.Post("/api/reset-password", api.ResetPassword)
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth)

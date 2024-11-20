@@ -29,6 +29,16 @@ type RegisterRequest struct {
 	Avatar   string `json:"avatar,omitempty"`
 }
 
+type CheckAccountRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+type ResetPasswordRequest struct {
+	Email       string `json:"email"`
+	NewPassword string `json:"new_password"`
+}
+
 type DepositRequest struct {
 	Amount int `json:"amount"`
 }
@@ -114,7 +124,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hashedPassword, err := auth.HashPassword(registerRequest.Password)
-	log.Println("original password is ", registerRequest.Password, "hashed password is ", hashedPassword)
 	if err != nil {
 		http.Error(w, "Password hashing failed", http.StatusBadRequest)
 		return
@@ -143,6 +152,69 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"token":   token,
 		"message": "Registered successfully",
+	})
+}
+
+func CheckAccount(w http.ResponseWriter, r *http.Request) {
+	var checkRequest CheckAccountRequest
+	if err := json.NewDecoder(r.Body).Decode(&checkRequest); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	err := db.DB.Where("username = ? AND email = ?", checkRequest.Username, checkRequest.Email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "User with this username and email does not exist", http.StatusNotFound)
+		} else {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+		}
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "User exists",
+		"success": "true",
+	})
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var resetPwdRequest ResetPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&resetPwdRequest); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	err := db.DB.Where("email = ?", resetPwdRequest.Email).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "User with this username and email does not exist", http.StatusNotFound)
+		} else {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	hashedPassword, err := auth.HashPassword(resetPwdRequest.NewPassword)
+	if err != nil {
+		http.Error(w, "Password hashing failed", http.StatusBadRequest)
+		return
+	}
+
+	user.Password = hashedPassword
+	if err := db.DB.Save(&user).Error; err != nil {
+		http.Error(w, "Failed to update password", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Password updated successfully",
+		"success": "true",
 	})
 }
 
