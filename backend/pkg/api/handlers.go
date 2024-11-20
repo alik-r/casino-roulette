@@ -29,10 +29,6 @@ type RegisterRequest struct {
 	Avatar   string `json:"avatar,omitempty"`
 }
 
-type DepositRequest struct {
-	Amount int `json:"amount"`
-}
-
 type BetRequest struct {
 	BetAmount int         `json:"bet_amount"`
 	BetType   string      `json:"bet_type"`
@@ -144,48 +140,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		"token":   token,
 		"message": "Registered successfully",
 	})
-}
-
-func Deposit(w http.ResponseWriter, r *http.Request) {
-	username, ok := r.Context().Value(middleware.UsernameKey).(string)
-	if !ok || username == "" {
-		http.Error(w, "Unauthenticated user", http.StatusUnauthorized)
-		return
-	}
-
-	var deposit DepositRequest
-	err := json.NewDecoder(r.Body).Decode(&deposit)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if deposit.Amount <= 0 {
-		http.Error(w, "Invalid deposit amount", http.StatusBadRequest)
-		return
-	}
-
-	var user models.User
-	err = db.DB.Where("username = ?", username).First(&user).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			http.Error(w, "User not found", http.StatusNotFound)
-			return
-		} else {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		user.Balance += deposit.Amount
-		if err := db.DB.Save(&user).Error; err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
 }
 
 func PlaceBet(w http.ResponseWriter, r *http.Request) {
