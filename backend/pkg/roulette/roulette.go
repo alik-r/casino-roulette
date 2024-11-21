@@ -56,7 +56,7 @@ func Payout(betType BetType, betValue interface{}, result RouletteResult) int {
 		betColor := betValue.(string)
 		if betColor == string(result.Color) {
 			if betColor == string(Green) {
-				return 35
+				return 2
 			}
 			return 1
 		}
